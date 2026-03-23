@@ -15,8 +15,10 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { GetUsersParamDto } from './dtos/get-users-param.dto';
 import { PatchUserDto } from './dtos/patch-user.dto';
 import { UsersService } from './providers/users.service';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('users')
+@ApiTags('Users')
 export class UsersController {
   constructor(
     // Inject Users Service
@@ -33,6 +35,26 @@ export class UsersController {
   // lococalhost:4000/users
   // lococalhost:4000/users/1234132
   @Get('{/:id}')
+  @ApiOperation({
+    summary: 'Fetches A List Of Registered Users On The Application',
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: String,
+    description: 'The upper limit of pages you want the pagination to return',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'page',
+    type: String,
+    description:
+      'The position of the page number that you want the API to return',
+    required: false,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Users fetched successfully based on the query',
+  })
   public getUsers(
     @Param() getUsersParamDto: GetUsersParamDto,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
