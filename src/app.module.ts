@@ -6,6 +6,8 @@ import { PostsModule } from './posts/posts.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/users.entity';
+import { MetaOptionsModule } from './meta-options/meta-options.module';
+import { TagsModule } from './tags/tags.module';
 
 @Module({
   imports: [
@@ -14,7 +16,8 @@ import { User } from './users/users.entity';
     AuthModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      entities: [User],
+      // entities: [User],
+      autoLoadEntities: true,
       synchronize: true,
       port: 5433,
       username: 'admin',
@@ -22,6 +25,8 @@ import { User } from './users/users.entity';
       host: 'localhost',
       database: 'express_prisma_db',
     }),
+    MetaOptionsModule,
+    TagsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

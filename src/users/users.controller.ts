@@ -28,8 +28,7 @@ export class UsersController {
   // pikri.ge/users/
   @Post()
   public createUsers(@Body() createUserDto: CreateUserDto) {
-    console.log(createUserDto);
-    return 'You sent a post request to users endpoint';
+    return this.usersService.createUser(createUserDto);
   }
 
   // lococalhost:4000/users

@@ -12,7 +12,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { postStatus } from '../enums/post-type-status';
-import { CreatePostMetaOptionsDto } from './create-meta-options.dto';
+import { CreatePostMetaOptionsDto } from '../../meta-options/dtos/create-meta-options.dto';
 import { postType } from '../enums/post-type-enum';
 import { Type } from 'class-transformer';
 

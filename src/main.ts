@@ -19,7 +19,7 @@ async function bootstrap() {
     .setDescription('Use The Base URL : http://localhost:3000')
     .setTermsOfService('http://localhost:3000/terms-of-service')
     .setLicense('MIT license', 'https://github.com')
-    .addServer('http://localhost:3000/')
+    .addServer('http://localhost:3000')
     .setVersion('1.0')
     .build();
 
