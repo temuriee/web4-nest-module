@@ -5,6 +5,10 @@ import { Post } from '../post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { CreatePostDto } from '../dtos/create-post.dto';
+import { GetPostsDto } from '../dtos/get-posts.dto';
+import { PaginationProvider } from 'src/common/pagination/providers/pagination.provider';
+import { TagsService } from 'src/tags/providers/tags.service';
+import { Paginated } from 'src/common/pagination/interfaces/paginatedInterface';
 
 @Injectable()
 export class PostsService {
@@ -16,42 +20,40 @@ export class PostsService {
 
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+
+    private readonly tagsService: TagsService,
+
+    private readonly paginationProvider: PaginationProvider,
   ) {}
 
+
   public async create(createPostDto: CreatePostDto) {
-    // იპოვე იუზერი author ID_ის მეშვეობით
+    let author = await this.usersService.findOneById(createPostDto.authorId);
 
-    let user = await this.usersRepository.findOneBy({
-      id: createPostDto.authorId,
-    });
+    let tags = await this.tagsService.findMultipleTags(createPostDto.tags);
 
-    // პოსტის შექმნა
+    // Create the post
     let post = this.postsRepository.create({
       ...createPostDto,
-      author: user ?? undefined,
+      author: author,
+      tags: tags,
     });
 
     return await this.postsRepository.save(post);
   }
 
+
   // http://localhost:3000/posts/1234
-  public findAll(userId: string) {
-    // const user = findOneById(userId);
-
-    const user = this.usersService.findOneById(userId);
-
-    return [
+  public async findAll(postQuery: GetPostsDto, userId: string,):Promise<Paginated<Post>> {
+    let posts = await this.paginationProvider.paginateQuery(
       {
-        userName: user.firstName,
-        title: 'Postebis saxeli',
-        content: 'postebis agwera',
+        limit: postQuery.limit,
+        page: postQuery.page,
       },
-      {
-        userName: user.firstName,
-        title: 'Postebis saxeli2',
-        content: 'postebis agwera2',
-      },
-    ];
+      this.postsRepository,
+    );
+
+    return posts;
   }
 
   public async delete(id: number) {

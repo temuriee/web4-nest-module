@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
 import { MetaOptionsModule } from './meta-options/meta-options.module';
 import { TagsModule } from './tags/tags.module';
+import { PaginationModule } from './common/pagination/pagination.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { TagsModule } from './tags/tags.module';
     }),
     MetaOptionsModule,
     TagsModule,
+    PaginationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
