@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -14,9 +15,10 @@ async function bootstrap() {
     }),
   );
 
+  // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle('Nest JS Web4')
-    .setDescription('Use The Base URL : http://localhost:3000')
+    .setDescription('Use base url : http://localhost:3000')
     .setTermsOfService('http://localhost:3000/terms-of-service')
     .setLicense('MIT license', 'https://github.com')
     .addServer('http://localhost:3000')
@@ -27,6 +29,6 @@ async function bootstrap() {
 
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3005);
 }
 bootstrap();
