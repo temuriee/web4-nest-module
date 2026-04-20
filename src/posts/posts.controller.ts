@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -36,28 +38,34 @@ export class PostsController {
   }
 
   @ApiOperation({
-    summary: 'Creates a new post for the blog.',
+    summary: 'Creates a new blog post',
   })
   @ApiResponse({
     status: 201,
-    description:
-      'You get a success 201 response if the post is created successfully',
+    description: 'You get a 201 response if your post is created successfully',
   })
   @Post()
   public createPost(@Body() createPostDto: CreatePostDto) {
-    console.log(createPostDto);
+    return this.postsService.create(createPostDto);
   }
 
   @ApiOperation({
-    summary: 'Updates and existing blog post in the database.',
+    summary: 'Updates an existing blog post',
   })
   @ApiResponse({
     status: 200,
-    description:
-      'You get a success 20o response if the post is updated successfully',
+    description: 'A 200 response if the post is updated successfully',
   })
   @Patch()
   public updatePost(@Body() patchPostsDto: PatchPostDto) {
-    console.log(patchPostsDto);
+    return this.postsService.update(patchPostsDto);
+  }
+
+  /**
+   * Route to delete a post
+   */
+  @Delete()
+  public deletePost(@Query('id', ParseIntPipe) id: number) {
+    return this.postsService.delete(id);
   }
 }

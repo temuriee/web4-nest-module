@@ -1,33 +1,39 @@
+import { BcryptProvider } from './../../auth/providers/bcrypt.provider';
 import {
   BadRequestException,
-  forwardRef,
   Inject,
   Injectable,
   RequestTimeoutException,
+  forwardRef,
 } from '@nestjs/common';
+import { CreateUserDto } from '../dtos/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user.entity';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from '../dtos/create-user.dto';
 import { HashingProvider } from 'src/auth/providers/hashing.provider';
 
 @Injectable()
 export class CreateUserProvider {
   constructor(
-    // Inject User Repository
+    /**
+     * Injecting usersRepository
+     */
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private usersRepository: Repository<User>,
 
-    // Inject Bcrypt Provider
+    /**
+     * Inject BCrypt Provider
+     */
     @Inject(forwardRef(() => HashingProvider))
     private readonly hashingProvider: HashingProvider,
   ) {}
 
   public async createUser(createUserDto: CreateUserDto) {
-    let exitingUser: User | null = null;
+    let existingUser = undefined;
 
     try {
-      exitingUser = await this.userRepository.findOne({
+      // Check is user exists with same email
+      existingUser = await this.usersRepository.findOne({
         where: { email: createUserDto.email },
       });
     } catch (error) {
@@ -41,21 +47,21 @@ export class CreateUserProvider {
       );
     }
 
-    // Handle exception if exitingUser exists
-    if (exitingUser) {
+    // Handle exception
+    if (existingUser) {
       throw new BadRequestException(
         'The user already exists, please check your email.',
       );
     }
 
-    // create a new User
-    let newUser = this.userRepository.create({
+    // Create a new user
+    let newUser = this.usersRepository.create({
       ...createUserDto,
       password: await this.hashingProvider.hashPassword(createUserDto.password),
     });
 
     try {
-      newUser = await this.userRepository.save(newUser);
+      newUser = await this.usersRepository.save(newUser);
     } catch (error) {
       throw new RequestTimeoutException(
         'Unable to process your request at the moment please try later',

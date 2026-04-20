@@ -1,23 +1,39 @@
 import {
-  forwardRef,
   Inject,
   Injectable,
   RequestTimeoutException,
   UnauthorizedException,
+  forwardRef,
 } from '@nestjs/common';
 import { UsersService } from 'src/users/providers/users.service';
-import { HashingProvider } from './hashing.provider';
 import { SignInDto } from '../dtos/signin.dto';
+import { HashingProvider } from './hashing.provider';
+import { JwtService } from '@nestjs/jwt';
+import jwtConfig from '../config/jwt.config';
+import type { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class SignInProvider {
   constructor(
-    // Inject UserService
+    // Injecting UserService
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
 
-    // Hashing Provider
+    /**
+     * Inject the hashingProvider
+     */
     private readonly hashingProvider: HashingProvider,
+
+    /**
+     * Inject jwtService
+     */
+    private readonly jwtService: JwtService,
+
+    /**
+     * Inject jwtConfiguration
+     */
+    @Inject(jwtConfig.KEY)
+    private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
   ) {}
 
   public async signIn(signInDto: SignInDto) {
@@ -31,8 +47,8 @@ export class SignInProvider {
     try {
       // Compare the password to hash
       isEqual = await this.hashingProvider.comparePassword(
-        signInDto.password, // პაროლი რაც იუზერმა შეიყვანა
-        user.password, // ბაზაში არსებული დაჰეშილი პაროლი რომელიც ვიპოვეთ findOneByEmail-სერვისით
+        signInDto.password,
+        user.password,
       );
     } catch (error) {
       throw new RequestTimeoutException(error, {
@@ -44,7 +60,23 @@ export class SignInProvider {
       throw new UnauthorizedException('Password does not match');
     }
 
-    // Send confirmation
-    return true;
+    // Generate access token
+    const accessToken = await this.jwtService.signAsync(
+      {
+        sub: user.id,
+        email: user.email,
+      },
+      {
+        audience: this.jwtConfiguration.audience,
+        issuer: this.jwtConfiguration.issuer,
+        secret: this.jwtConfiguration.secret,
+        expiresIn: this.jwtConfiguration.accessTokenTtl,
+      },
+    );
+
+    // Return Access token
+    return {
+      accessToken,
+    };
   }
 }

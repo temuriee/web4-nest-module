@@ -1,3 +1,6 @@
+import { PatchPostDto } from './../dtos/patch-post.dto';
+import { TagsService } from './../../tags/providers/tags.service';
+import { CreatePostDto } from '../dtos/create-post.dto';
 import {
   BadRequestException,
   Injectable,
@@ -7,28 +10,33 @@ import { UsersService } from 'src/users/providers/users.service';
 import { Repository } from 'typeorm';
 import { Post } from '../post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { MetaOption } from 'src/meta-options/meta-option.entity';
 import { User } from 'src/users/user.entity';
-import { CreatePostDto } from '../dtos/create-post.dto';
+import { waitForDebugger } from 'inspector';
 import { GetPostsDto } from '../dtos/get-posts.dto';
 import { PaginationProvider } from 'src/common/pagination/providers/pagination.provider';
-import { TagsService } from 'src/tags/providers/tags.service';
 import { Paginated } from 'src/common/pagination/interfaces/paginated.interface';
-import { PatchPostDto } from '../dtos/patch-post.dto';
-import { Tag } from 'src/tags/tag.entity';
 
 @Injectable()
 export class PostsService {
   constructor(
+    /*
+     * Injecting Users Service
+     */
     private readonly usersService: UsersService,
 
+    /**
+     * Injecting postsRepository
+     */
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
 
-    @InjectRepository(User)
-    private readonly usersRepository: Repository<User>,
-
+    /**
+     * Injecting Tags service
+     */
     private readonly tagsService: TagsService,
 
+    // Injecting pagination provider
     private readonly paginationProvider: PaginationProvider,
   ) {}
 
@@ -38,22 +46,21 @@ export class PostsService {
   public async create(createPostDto: CreatePostDto) {
     let author = await this.usersService.findOneById(createPostDto.authorId);
 
-    let tags = await this.tagsService.findMultipleTags(
-      createPostDto.tags ?? [],
-    );
+    let tags = await this.tagsService.findMultipleTags(createPostDto.tags);
 
     // Create the post
     let post = this.postsRepository.create({
       ...createPostDto,
       author: author,
       tags: tags,
-      metaOptions: createPostDto.metaOptions ? [createPostDto.metaOptions] : [],
     });
 
     return await this.postsRepository.save(post);
   }
 
-  // http://localhost:3000/posts/1234
+  /**
+   * Method to find all posts
+   */
   public async findAll(
     postQuery: GetPostsDto,
     userId: string,
@@ -68,11 +75,14 @@ export class PostsService {
 
     return posts;
   }
-
+  /**
+   * Method to delete a post from the database
+   */
   public async delete(id: number) {
+    // Find the post from the database
     await this.postsRepository.delete(id);
 
-    return { delete: true, id };
+    return { deleted: true, id };
   }
 
   /**
@@ -80,12 +90,12 @@ export class PostsService {
    */
   public async update(patchPostDto: PatchPostDto) {
     //  tags which fetched from the database
-    let tags: Tag[] = [];
+    let tags = undefined;
     //  post which fetched from the database
-    let post: Post | null = null;
+    let post = undefined;
 
     try {
-      tags = await this.tagsService.findMultipleTags(patchPostDto.tags ?? []);
+      tags = await this.tagsService.findMultipleTags(patchPostDto.tags);
     } catch (error) {
       throw new RequestTimeoutException(
         'Unable to process request at this time, please try again later.',
@@ -97,7 +107,7 @@ export class PostsService {
 
     // number of tags need to be equal
 
-    if (!tags || tags.length !== (patchPostDto.tags ?? []).length) {
+    if (!tags || tags.length !== patchPostDto.tags.length) {
       throw new BadRequestException('One or more tags are invalid.', {
         description: `One or more tags provided are invalid.`,
       });

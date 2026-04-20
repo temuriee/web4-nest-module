@@ -18,10 +18,9 @@ import {
 
 import { CreatePostMetaOptionsDto } from '../../meta-options/dtos/create-post-meta-options.dto';
 import { Type } from 'class-transformer';
-
+import { postStatus } from '../enums/postStatus.enum';
+import { postType } from '../enums/postType.enum';
 import { MetaOption } from 'src/meta-options/meta-option.entity';
-import { postType } from '../enums/post-type.enum';
-import { postStatus } from '../enums/post-status.enum';
 
 export class CreatePostDto {
   @ApiProperty({

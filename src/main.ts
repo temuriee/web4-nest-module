@@ -1,12 +1,14 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
-
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
+import { AppModule } from './app.module';
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  /*
+   * Use validation pipes globally
+   */
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -18,20 +20,25 @@ async function bootstrap() {
     }),
   );
 
-  // Swagger configuration
+  /**
+   * swagger configuration
+   */
   const config = new DocumentBuilder()
-    .setTitle('Nest JS Web4')
-    .setDescription('Use base url : http://localhost:3000')
+    .setTitle('NestJs Masterclass - Blog app API')
+    .setDescription('Use the base API URL as http://localhost:3000')
     .setTermsOfService('http://localhost:3000/terms-of-service')
-    .setLicense('MIT license', 'https://github.com')
+    .setLicense(
+      'MIT License',
+      'https://github.com/git/git-scm.com/blob/main/MIT-LICENSE.txt',
+    )
     .addServer('http://localhost:3000')
     .setVersion('1.0')
     .build();
 
+  // Instantiate Document
   const document = SwaggerModule.createDocument(app, config);
-
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT ?? 3005);
+  await app.listen(3000);
 }
 bootstrap();

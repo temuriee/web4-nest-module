@@ -3,21 +3,25 @@ import {
   RequestTimeoutException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class FindOneUserByEmailProvider {
   constructor(
+    /**
+     * Inject usersRepository
+     */
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
   ) {}
 
   public async findOneByEmail(email: string) {
-    let user: User | null = null;
+    let user: User | undefined = undefined;
 
     try {
+      // This will return null if the user is not found
       user = await this.usersRepository.findOneBy({
         email: email,
       });

@@ -8,32 +8,33 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { postType } from './enums/post-type.enum';
-import { postStatus } from './enums/post-status.enum';
+
 import { CreatePostMetaOptionsDto } from '../meta-options/dtos/create-post-meta-options.dto';
 import { MetaOption } from 'src/meta-options/meta-option.entity';
-import { User } from 'src/users/user.entity';
 import { Tag } from 'src/tags/tag.entity';
+import { User } from 'src/users/user.entity';
+import { postStatus } from './enums/postStatus.enum';
+import { postType } from './enums/postType.enum';
 
 @Entity()
 export class Post {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Column({
     type: 'varchar',
     length: 512,
     nullable: false,
   })
-  title!: string;
+  title: string;
 
   @Column({
-    type: 'varchar',
+    type: 'enum',
     enum: postType,
     nullable: false,
     default: postType.POST,
   })
-  postType!: postType;
+  postType: postType;
 
   @Column({
     type: 'varchar',
@@ -41,7 +42,7 @@ export class Post {
     nullable: false,
     unique: true,
   })
-  slug!: string;
+  slug: string;
 
   @Column({
     type: 'enum',
@@ -49,7 +50,7 @@ export class Post {
     nullable: false,
     default: postStatus.DRAFT,
   })
-  status!: postStatus;
+  status: postStatus;
 
   @Column({
     type: 'text',
@@ -80,14 +81,14 @@ export class Post {
     cascade: true,
     eager: true,
   })
-  metaOptions?: CreatePostMetaOptionsDto[];
+  metaOptions?: MetaOption;
 
   @ManyToOne(() => User, (user) => user.posts, {
     eager: true,
   })
-  author!: User;
+  author: User;
 
-  @ManyToMany(() => Tag, (tag) => tag.posts, {
+  @ManyToMany(() => Tag, {
     eager: true,
   })
   @JoinTable()
