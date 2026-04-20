@@ -10,18 +10,7 @@ export class AuthService {
     private readonly usersService: UsersService,
   ) {}
 
-   public signIn(signInDto: SignInDto){
-    
-   }
-
-
-  public login(email: string, password: string, id: number) {
-    const user = this.usersService.findOneById(id);
-
-    return 'Simple Token';
-  }
-
-  public isAuth() {
-    return true;
+  public signIn(signInDto: SignInDto) {
+    // return await this.signInProvider.signIn(signInDto)
   }
 }

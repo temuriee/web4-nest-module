@@ -11,6 +11,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { UsersCreateManyProvider } from './users-create-many.provider';
 import { CreateManyUsersDto } from '../dtos/create-many-users.dto';
+import { CreateUserProvider } from './create-user.provider';
+import { FindOneUserByEmailProvider } from './find-one-user-by-email.provider';
 
 @Injectable()
 export class UsersService {
@@ -20,60 +22,18 @@ export class UsersService {
 
     // Inject UsersCreateManyProvider
     private readonly usersCreateManyProvider: UsersCreateManyProvider,
+
+    // Inject Create User Provider
+    private readonly createUserProvider: CreateUserProvider,
+
+    /**
+     * Inject findOneUserByEmailProvider
+     */
+    private readonly findOneUserByEmailProvider: FindOneUserByEmailProvider,
   ) {}
 
   public async createUser(createUserDto: CreateUserDto) {
-    let existingUser: User | null = null;
-
-    try {
-      existingUser = await this.usersRepository.findOne({
-        where: { email: createUserDto.email },
-      });
-    } catch (error) {
-      throw new RequestTimeoutException(
-        'Unable to process request at this time, please try again later',
-        {
-          description: 'Error conneting to the database',
-        },
-      );
-    }
-
-    if (existingUser) {
-      throw new BadRequestException('User with email already exists', {
-        description: `User with ${createUserDto.email} already exists`,
-      });
-    }
-
-    let newUser = this.usersRepository.create(createUserDto);
-
-    try {
-      newUser = await this.usersRepository.save(newUser);
-    } catch (error) {
-      throw new RequestTimeoutException(
-        'unable to process request at this time, please try again later',
-        { description: 'Error connecting to the database' },
-      );
-    }
-
-    return newUser;
-  }
-
-  // Method to find all Users
-  public findAll(
-    getUserParamDto: GetUsersParamDto,
-    limit: number,
-    page: number,
-  ) {
-    return [
-      {
-        firstName: 'John',
-        email: 'john@doe.com',
-      },
-      {
-        firstName: 'Alice',
-        email: 'alice@doe.com',
-      },
-    ];
+    return await this.createUserProvider.createUser(createUserDto);
   }
 
   //   Find user by id
@@ -104,5 +64,10 @@ export class UsersService {
 
   public async createMany(createUsersDto: CreateManyUsersDto) {
     return this.usersCreateManyProvider.UsersCreateManyProvider(createUsersDto);
+  }
+
+  // Finds one user by email
+  public async findOneByEmail(email: string) {
+    return await this.findOneUserByEmailProvider.findOneByEmail(email);
   }
 }

@@ -32,7 +32,7 @@ export class CreatePostDto {
   @MinLength(4)
   @MaxLength(512)
   @IsNotEmpty()
-  title!: string;
+  title: string;
 
   @ApiProperty({
     enum: postType,

@@ -3,6 +3,6 @@ import { SignInDto } from './dtos/signin.dto';
 
 @Controller('auth')
 export class AuthController {
-    @Post()
-    public async signIn(@Body() signInDto: SignInDto){}
+  @Post()
+  public async signIn(@Body() signInDto: SignInDto) {}
 }

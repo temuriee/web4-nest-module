@@ -11,9 +11,11 @@ import { TagsModule } from 'src/tags/tags.module';
 @Module({
   controllers: [PostsController],
   providers: [PostsService],
-  imports: [UsersModule, TypeOrmModule.forFeature([Post, User]),
-PaginationModule,TagsModule],
+  imports: [
+    UsersModule,
+    TypeOrmModule.forFeature([Post, User]),
+    PaginationModule,
+    TagsModule,
+  ],
 })
-export class PostsModule {
-
-}
+export class PostsModule {}
