@@ -2,28 +2,29 @@ POST http://localhost:3000/users
 Content-Type: application/json
 
 {
-  "firstName": "John",
+  "firstName": "Mark",
   "lastName": "Doe",
-  "email": "john@doe.com",
+  "email": "mark@doe.com",
   "password": "Password123#"
 }
 
 
 POST http://localhost:3000/users/create-many
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE5LCJlbWFpbCI6ImpvaG5AZG9lLmNvbSIsImlhdCI6MTc2MjI2NTE4MCwiZXhwIjoxNzYyMjY4NzgwLCJhdWQiOiJ5b3VyX2p3dF9hdWRpZW5jZV9kZXYiLCJpc3MiOiJ5b3VyX2p3dF9pc3N1ZXJfZGV2In0.yqRe9irKlnJwAk6Mj-uHRorKL0nA12DEWEV5wcUhTy4
 
 {
 "users": [
     {
-      "firstName": "Mark2",
+      "firstName": "Mark",
       "lastName": "Doe",
-      "email": "mark2@doe.com",
+      "email": "mark@doe.com",
       "password": "Password123#"
     },
     {
-      "firstName": "Tom2",
+      "firstName": "Tom",
       "lastName": "Doe",
-      "email": "tom2@doe.com",
+      "email": "tom@doe.com",
       "password": "Password123#"
     }
   ]
