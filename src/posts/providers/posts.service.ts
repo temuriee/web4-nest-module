@@ -16,6 +16,8 @@ import { waitForDebugger } from 'inspector';
 import { GetPostsDto } from '../dtos/get-posts.dto';
 import { PaginationProvider } from 'src/common/pagination/providers/pagination.provider';
 import { Paginated } from 'src/common/pagination/interfaces/paginated.interface';
+import { ActiveUserData } from 'src/auth/interfaces/active-user-data.interface';
+import { CreatePostProvider } from './create-post.provider';
 
 @Injectable()
 export class PostsService {
@@ -38,24 +40,27 @@ export class PostsService {
 
     // Injecting pagination provider
     private readonly paginationProvider: PaginationProvider,
+
+    // inject create post provider
+
+    private readonly createPostProvider: CreatePostProvider,
   ) {}
 
   /**
    * Method to create a new post
    */
-  public async create(createPostDto: CreatePostDto) {
-    let author = await this.usersService.findOneById(createPostDto.authorId);
+  public async create(createPostDto: CreatePostDto, user: ActiveUserData) {
+    // let author = await this.usersService.findOneById(user.sub);
+    // let tags = await this.tagsService.findMultipleTags(createPostDto.tags);
+    // // Create the post
+    // let post = this.postsRepository.create({
+    //   ...createPostDto,
+    //   author: author,
+    //   tags: tags,
+    // });
+    // return await this.postsRepository.save(post);
 
-    let tags = await this.tagsService.findMultipleTags(createPostDto.tags);
-
-    // Create the post
-    let post = this.postsRepository.create({
-      ...createPostDto,
-      author: author,
-      tags: tags,
-    });
-
-    return await this.postsRepository.save(post);
+    return await this.createPostProvider.create(createPostDto, user);
   }
 
   /**
